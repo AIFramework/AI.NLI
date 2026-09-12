@@ -1,0 +1,11 @@
+# Ключ OpenRouter для демонстрационного приложения: в git не попадает никогда
+key.txt
+
+# Сборка .NET
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+.vs/
+.idea/

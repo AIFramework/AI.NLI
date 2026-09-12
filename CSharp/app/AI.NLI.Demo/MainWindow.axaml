@@ -1,0 +1,39 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AI.NLI.Demo.MainWindow"
+        Title="AI.NLI: диалог с экспертной системой"
+        Width="1400" Height="820">
+  <Grid ColumnDefinitions="*,1.3*,*" RowDefinitions="*,Auto" Margin="12">
+
+    <DockPanel Grid.Column="0" Margin="0,0,8,0">
+      <TextBlock DockPanel.Dock="Top" Text="Экспертная система (YAML)" FontWeight="SemiBold" Margin="0,0,0,4" />
+      <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,8,0,0">
+        <TextBlock Text="Модель OpenRouter" />
+        <TextBox x:Name="ModelInput" />
+        <CheckBox x:Name="VerifyBox" Content="Проверять, что значение следует из цитаты" />
+        <Button Content="Новый диалог" Click="OnReset" />
+        <TextBlock Text="Описание, модель и флаг применяются с нового диалога." TextWrapping="Wrap" Opacity="0.7" />
+      </StackPanel>
+      <TextBox x:Name="SchemaInput" AcceptsReturn="True" FontFamily="Consolas,monospace" />
+    </DockPanel>
+
+    <DockPanel Grid.Column="1" Margin="8,0">
+      <TextBlock DockPanel.Dock="Top" Text="Диалог" FontWeight="SemiBold" Margin="0,0,0,4" />
+      <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,8,0,0">
+        <WrapPanel x:Name="ChoicesPanel" />
+        <TextBox x:Name="MessageInput" AcceptsReturn="True" TextWrapping="Wrap" Height="80" />
+        <Button x:Name="SendButton" Content="Отправить" Click="OnSend" />
+      </StackPanel>
+      <TextBox x:Name="LogText" IsReadOnly="True" TextWrapping="Wrap" />
+    </DockPanel>
+
+    <Grid Grid.Column="2" RowDefinitions="Auto,*,Auto,*" Margin="8,0,0,0">
+      <TextBlock Text="Состояние формы" FontWeight="SemiBold" Margin="0,0,0,4" />
+      <TextBox Grid.Row="1" x:Name="StateText" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas,monospace" />
+      <TextBlock Grid.Row="2" Text="Журнал происхождения" FontWeight="SemiBold" Margin="0,8,0,4" />
+      <TextBox Grid.Row="3" x:Name="JournalText" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas,monospace" />
+    </Grid>
+
+    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" x:Name="StatusText" Margin="0,8,0,0" TextWrapping="Wrap" />
+  </Grid>
+</Window>

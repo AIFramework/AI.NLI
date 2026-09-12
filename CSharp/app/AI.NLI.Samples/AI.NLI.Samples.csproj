@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Общий пример для демо и замера: модель оценки квартиры и подключение к OpenRouter -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- OpenRouter совместим с API OpenAI: клиент OpenAI с другим адресом -->
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AI.NLI\AI.NLI.csproj" />
+  </ItemGroup>
+
+</Project>
