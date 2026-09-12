@@ -2,7 +2,7 @@ namespace AI.NLI;
 
 /// <summary>
 /// Один ход заполнения формы: реплика пользователя, затем источники, затем вопросы. Если спрашивать
-/// нечего, пустые поля закрываются умолчанием или догадкой по политике поля.
+/// нечего, пустые поля закрываются оценкой по границе, умолчанием или догадкой по политике поля.
 /// </summary>
 /// <param name="extractor">Извлечение значений из текста.</param>
 /// <param name="sources">Источники в порядке опроса: каждое поле ищется в них один раз за диалог.</param>
@@ -16,10 +16,14 @@ public sealed class FormFiller(FormExtractor extractor, IReadOnlyList<FormSource
 
         await SearchAsync(schema, state, ct);
 
+        var active = schema.Fields.Active(state.Values).ToDictionary(field => field.Name);
         var questions = state.Conflicts
             .Select(conflict => Question.ForConflict(schema.Fields.Named(conflict.Field)!, conflict))
+            .Concat(state.Vague
+                .Where(pair => active.ContainsKey(pair.Key) && !state.Unknown.Contains(pair.Key))
+                .Select(pair => Question.ForVague(active[pair.Key], pair.Value)))
             .Concat(schema.Fields.Missing(state.Values)
-                .Where(field => field.Missing == MissingPolicy.Ask && !state.Unknown.Contains(field.Name))
+                .Where(field => field.Missing == MissingPolicy.Ask && !state.Unknown.Contains(field.Name) && !state.Vague.ContainsKey(field.Name))
                 .Select(field => Question.For(field, Question.NoData)))
             .ToList();
         if (questions.Count == 0)
@@ -47,6 +51,13 @@ public sealed class FormFiller(FormExtractor extractor, IReadOnlyList<FormSource
 
     private async Task AssumeAsync(FormSchema schema, FormState state, string message, CancellationToken ct)
     {
+        // Граница, которую так и не уточнили: лучше приблизительная оценка со слов пользователя, чем умолчание
+        foreach (var (name, bound) in state.Vague.ToList())
+            if (!state.Values.ContainsKey(name) && FieldFormat.Parse(schema.Fields.Named(name)!, bound.Value).Problem is null)
+                state.Apply(schema.Fields.Named(name)!, bound);
+            else
+                state.Vague.Remove(name);
+
         foreach (var field in schema.Fields.Missing(state.Values).Where(field => field.Default is not null).ToList())
             state.Apply(field, new FieldValue(FieldFormat.Normalize(field, field.Default!), ValueSource.Default));
 
@@ -64,5 +75,12 @@ public sealed class FormFiller(FormExtractor extractor, IReadOnlyList<FormSource
             state.Apply(schema.Fields.Named(name)!, value);
         foreach (var name in found.Unknown)
             state.MarkUnknown(name);
+
+        // Граница второй раз подряд: переспрашивать дальше бессмысленно, берем оценку как приблизительную
+        foreach (var (name, bound) in found.Bounds)
+            if (state.Vague.ContainsKey(name) && FieldFormat.Parse(schema.Fields.Named(name)!, bound.Value).Problem is null)
+                state.Apply(schema.Fields.Named(name)!, bound);
+            else
+                state.MarkVague(name, bound);
     }
 }

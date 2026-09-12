@@ -59,6 +59,18 @@ public sealed class FormExtractorTests
     }
 
     [Fact]
+    public async Task ApproximateValueGoesToEntailmentCheckMarked()
+    {
+        // Без пометки проверка видит «area = 80» против «примерно 80» и отбрасывает честное приблизительное значение
+        var chat = new FakeChat(FakeChat.Route(("Ты заполняешь", _ => FakeChat.Approximate("area", "80", "Примерно 80 квадратов"))));
+
+        var found = await new FormExtractor(chat).ExtractAsync(Fields, new SourceText("Примерно 80 квадратов"), ValueSource.User);
+
+        Assert.True(found.Values["area"].Approximate);
+        Assert.Contains("area () = 80 (приблизительно); цитата: «Примерно 80 квадратов»", chat.Prompts[^1]);
+    }
+
+    [Fact]
     public async Task FallsBackWhenModelRejectsJsonSchema()
     {
         var chat = new FakeChat(_ => FakeChat.Values(("city", "Казань", "в Казани"))) { RejectSchema = true };

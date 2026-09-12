@@ -15,6 +15,12 @@ public sealed class FormState
     /// <summary>Поля, про которые пользователь сказал «не знаю»: их больше не спрашивают.</summary>
     public HashSet<string> Unknown { get; init; } = [];
 
+    /// <summary>
+    /// Поля, для которых названа только граница («выше 4-го»). Их переспрашивают один раз; если ответ
+    /// снова граница или «не знаю», берется оценка с пометкой «приблизительно».
+    /// </summary>
+    public Dictionary<string, FieldValue> Vague { get; init; } = [];
+
     /// <summary>Поля, по которым источники уже опрошены.</summary>
     public HashSet<string> Searched { get; init; } = [];
 
@@ -42,7 +48,7 @@ public sealed class FormState
         if (!Values.TryGetValue(field.Name, out var current))
             Set(field.Name, value, "задано");
         else if (FieldFormat.Same(field, current, value))
-            return;
+            Vague.Remove(field.Name);
         else if (value.Source == ValueSource.User)
             Set(field.Name, value, "исправлено");
         else if (current.IsAssumed && !value.IsAssumed)
@@ -52,6 +58,13 @@ public sealed class FormState
             Conflicts.Add(new FieldConflict(field.Name, current, value));
             Log(field.Name, "противоречие", value);
         }
+    }
+
+    /// <summary>Названа только граница: запоминаем, чтобы переспросить.</summary>
+    public void MarkVague(string field, FieldValue bound)
+    {
+        Vague[field] = bound;
+        Log(field, "только граница", bound);
     }
 
     /// <summary>Пользователь не знает значения.</summary>
@@ -69,6 +82,7 @@ public sealed class FormState
         Pending = [];
         Values.Clear();
         Unknown.Clear();
+        Vague.Clear();
         Searched.Clear();
         Asked.Clear();
         Conflicts.Clear();
@@ -84,6 +98,7 @@ public sealed class FormState
     {
         Values[field] = value;
         Unknown.Remove(field);
+        Vague.Remove(field);
         Conflicts.RemoveAll(conflict => conflict.Field == field);
         Log(field, action, value);
     }

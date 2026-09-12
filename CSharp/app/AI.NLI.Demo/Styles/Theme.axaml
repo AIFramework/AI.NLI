@@ -1,0 +1,284 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Styles.Resources>
+    <SolidColorBrush x:Key="PageBrush" Color="#F4F5FA" />
+    <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="LineBrush" Color="#E6E8F0" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#4F46E5" />
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#4338CA" />
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="#EEF0FF" />
+    <SolidColorBrush x:Key="AccentLineBrush" Color="#D9DCFF" />
+    <SolidColorBrush x:Key="InkBrush" Color="#111827" />
+    <SolidColorBrush x:Key="MutedBrush" Color="#6B7280" />
+    <SolidColorBrush x:Key="WarnSoftBrush" Color="#FFF7E6" />
+    <SolidColorBrush x:Key="WarnLineBrush" Color="#FBD9A5" />
+    <SolidColorBrush x:Key="WarnInkBrush" Color="#9A5B00" />
+    <SolidColorBrush x:Key="OkSoftBrush" Color="#ECFDF3" />
+    <SolidColorBrush x:Key="OkInkBrush" Color="#18794E" />
+  </Styles.Resources>
+
+  <!-- Текст -->
+  <Style Selector="TextBlock.h1">
+    <Setter Property="FontSize" Value="17" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+  <Style Selector="TextBlock.h2">
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+  <Style Selector="TextBlock.muted">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+  </Style>
+  <Style Selector="TextBlock.eyebrow">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+  </Style>
+
+  <!-- Шапка -->
+  <Style Selector="Border.header">
+    <Setter Property="Background" Value="{StaticResource CardBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="Padding" Value="24,14" />
+  </Style>
+  <Style Selector="Border.logo">
+    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Width" Value="42" />
+    <Setter Property="Height" Value="42" />
+  </Style>
+  <Style Selector="Border.logo > TextBlock">
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <!-- Лента -->
+  <Style Selector="Border.user">
+    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+    <Setter Property="CornerRadius" Value="18,18,4,18" />
+    <Setter Property="Padding" Value="14,10" />
+    <Setter Property="HorizontalAlignment" Value="Right" />
+    <Setter Property="MaxWidth" Value="560" />
+  </Style>
+  <Style Selector="Border.user SelectableTextBlock">
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+  <Style Selector="Border.bot">
+    <Setter Property="Background" Value="{StaticResource CardBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="18,18,18,4" />
+    <Setter Property="Padding" Value="18,14" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="MaxWidth" Value="720" />
+    <Setter Property="BoxShadow" Value="0 1 3 0 #0D111827" />
+  </Style>
+  <Style Selector="Border.bot SelectableTextBlock">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="LineHeight" Value="21" />
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+  <Style Selector="Border.bot.warning">
+    <Setter Property="Background" Value="{StaticResource WarnSoftBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource WarnLineBrush}" />
+  </Style>
+  <Style Selector="Border.bot.result">
+    <Setter Property="BorderBrush" Value="{StaticResource AccentLineBrush}" />
+    <Setter Property="BorderThickness" Value="1.5" />
+  </Style>
+
+  <!-- Показатели вывода -->
+  <Style Selector="Border.metric">
+    <Setter Property="Background" Value="{StaticResource AccentSoftBrush}" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Padding" Value="14,10" />
+    <Setter Property="Margin" Value="0,0,10,10" />
+    <Setter Property="MinWidth" Value="140" />
+  </Style>
+  <Style Selector="TextBlock.metric-value">
+    <Setter Property="FontSize" Value="20" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+  </Style>
+  <Style Selector="TextBlock.metric-label">
+    <Setter Property="FontSize" Value="11.5" />
+    <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+  </Style>
+  <Style Selector="Border.metric.main">
+    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+  </Style>
+  <Style Selector="Border.metric.main TextBlock.metric-value">
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="FontSize" Value="26" />
+  </Style>
+  <Style Selector="Border.metric.main TextBlock.metric-label">
+    <Setter Property="Foreground" Value="#E0E3FF" />
+  </Style>
+
+  <!-- Метки и оговорки -->
+  <Style Selector="Border.tag">
+    <Setter Property="Background" Value="{StaticResource WarnSoftBrush}" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="8,2" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+  </Style>
+  <Style Selector="Border.tag > TextBlock">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource WarnInkBrush}" />
+  </Style>
+  <Style Selector="Border.notice">
+    <Setter Property="Background" Value="{StaticResource OkSoftBrush}" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="10,6" />
+  </Style>
+  <Style Selector="Border.notice > TextBlock">
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+    <Setter Property="Foreground" Value="{StaticResource OkInkBrush}" />
+  </Style>
+  <Style Selector="Border.notice.warning">
+    <Setter Property="Background" Value="{StaticResource WarnSoftBrush}" />
+  </Style>
+  <Style Selector="Border.notice.warning > TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource WarnInkBrush}" />
+  </Style>
+  <Style Selector="Border.badge">
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="7,2" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <!-- Кнопки -->
+  <Style Selector="Button.chip">
+    <Setter Property="Background" Value="{StaticResource AccentSoftBrush}" />
+    <Setter Property="Foreground" Value="#3730A3" />
+    <Setter Property="BorderBrush" Value="{StaticResource AccentLineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="Padding" Value="14,7" />
+    <Setter Property="Margin" Value="0,0,8,8" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.chip:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#E0E3FF" />
+    <Setter Property="BorderBrush" Value="#C3C8FF" />
+    <Setter Property="Foreground" Value="#312E81" />
+  </Style>
+  <Style Selector="Button.chip:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#F3F4F6" />
+    <Setter Property="BorderBrush" Value="#EBEDF2" />
+    <Setter Property="Foreground" Value="#A0A6B1" />
+  </Style>
+  <Style Selector="Button.primary">
+    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Padding" Value="20,10" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="VerticalAlignment" Value="Bottom" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource AccentHoverBrush}" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+  <Style Selector="Button.primary:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#B9BEF7" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+  <Style Selector="Button.ghost">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="14,8" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+
+  <!-- Строка ввода -->
+  <Style Selector="Border.composer">
+    <Setter Property="Background" Value="{StaticResource CardBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="Padding" Value="8" />
+    <Setter Property="BoxShadow" Value="0 4 18 0 #12111827" />
+  </Style>
+  <Style Selector="TextBox.composer">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="MinHeight" Value="42" />
+    <Setter Property="MaxHeight" Value="140" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Margin" Value="0,0,8,0" />
+  </Style>
+  <Style Selector="TextBox.composer /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="TextBox.composer:pointerover /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="TextBox.composer:focus /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="TextBox.code">
+    <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, monospace" />
+    <Setter Property="FontSize" Value="12.5" />
+  </Style>
+
+  <!-- Боковая панель -->
+  <Style Selector="Border.side">
+    <Setter Property="Background" Value="{StaticResource CardBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+    <Setter Property="BorderThickness" Value="1,0,0,0" />
+    <Setter Property="Padding" Value="18,6,18,14" />
+  </Style>
+  <Style Selector="Border.row">
+    <Setter Property="Background" Value="#FAFBFD" />
+    <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Padding" Value="12,10" />
+    <Setter Property="Margin" Value="0,0,0,8" />
+  </Style>
+  <Style Selector="TextBlock.value">
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+  <Style Selector="TextBlock.quote">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontStyle" Value="Italic" />
+    <Setter Property="Foreground" Value="#4B5563" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+  <Style Selector="TextBlock.note">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{StaticResource WarnInkBrush}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+  <Style Selector="ProgressBar.progress">
+    <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+    <Setter Property="Background" Value="{StaticResource LineBrush}" />
+    <Setter Property="MinHeight" Value="6" />
+    <Setter Property="Height" Value="6" />
+    <Setter Property="CornerRadius" Value="3" />
+  </Style>
+  <Style Selector="TabItem">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="Padding" Value="12,0" />
+  </Style>
+</Styles>

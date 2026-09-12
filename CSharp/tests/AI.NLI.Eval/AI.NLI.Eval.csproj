@@ -8,10 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\app\AI.NLI.Samples\AI.NLI.Samples.csproj" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.4.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\AI.NLI\AI.NLI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Замер идет на той же учебной системе, что и демо: исходники берутся ссылкой, без отдельной библиотеки -->
+    <Compile Include="..\..\app\AI.NLI.Demo\TaganrogRegression.cs" Link="Demo\TaganrogRegression.cs" />
+    <Compile Include="..\..\app\AI.NLI.Demo\OpenRouter.cs" Link="Demo\OpenRouter.cs" />
     <None Include="cases.yaml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

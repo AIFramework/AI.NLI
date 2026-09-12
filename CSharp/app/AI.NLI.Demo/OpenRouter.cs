@@ -3,15 +3,14 @@ using Microsoft.Extensions.AI;
 using OpenAI;
 using OpenAI.Chat;
 
-namespace AI.NLI.Samples;
+namespace AI.NLI.Demo;
 
 /// <summary>
 /// Подключение к OpenRouter. Ключ берется из OPENROUTER_API_KEY или из key.txt в каталоге приложения
 /// либо выше по дереву (корень репозитория; файл в .gitignore).
 /// </summary>
-public static class OpenRouter
+internal static class OpenRouter
 {
-    /// <summary>Модель по умолчанию.</summary>
     public const string DefaultModel = "google/gemini-2.5-flash";
 
     private static readonly Uri Endpoint = new("https://openrouter.ai/api/v1");

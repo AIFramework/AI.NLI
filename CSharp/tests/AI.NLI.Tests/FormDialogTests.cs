@@ -54,6 +54,7 @@ public sealed class FormDialogTests
 
         Assert.Equal(TurnKind.Result, result.Kind);
         Assert.Equal(54 * 1.15 * 1.01, (double)result.Output!["price"]!, 6);
+        Assert.Equal(["balcony"], result.Check!.Robust.Select(field => field.Name));
         Assert.Empty(state.Pending);
     }
 

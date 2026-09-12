@@ -6,7 +6,9 @@ namespace AI.NLI;
 /// <summary>Формат значений: приведение к каноническому виду и разбор в типизированное значение.</summary>
 public static class FieldFormat
 {
-    private const double ApproximateShare = 0.1;
+    /// <summary>Допуск приблизительного значения: «около 50» совпадает с 45–55.</summary>
+    public const double ApproximateShare = 0.1;
+
     private static readonly string[] DateFormats = ["yyyy-MM-dd", "dd.MM.yyyy", "d.M.yyyy", "dd/MM/yyyy", "yyyy.MM.dd"];
     private static readonly string[] Yes = ["true", "да", "есть", "yes"];
     private static readonly string[] No = ["false", "нет", "no"];

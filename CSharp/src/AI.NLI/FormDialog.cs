@@ -9,7 +9,7 @@ namespace AI.NLI;
 /// </summary>
 public sealed class FormDialog
 {
-    private const string WhatIfContext = "Пользователь спрашивает, что будет при других данных: верни значения из его предположения.";
+    private const string WhatIfContext = "Пользователь спрашивает, что будет при других данных: верни значения из его предположения как exact.";
 
     private readonly IReadOnlyList<ExpertSystem> _systems;
     private readonly DialogOptions _options;
@@ -52,7 +52,7 @@ public sealed class FormDialog
         {
             TurnIntent.WhatIf when state.Output is not null => await WhatIfAsync(system, state, message, ct),
             TurnIntent.AboutResult when state.Output is not null => new DialogTurn(TurnKind.Answer,
-                await _explainer.ExplainAsync(system.Schema, state.Values, state.Output, message, ct: ct)) { Output = state.Output },
+                await _explainer.ExplainAsync(system.Schema, state.Values, state.Output, message, ct: ct)),
             _ => await FillAsync(system, state, message, ct)
         };
     }
@@ -82,32 +82,31 @@ public sealed class FormDialog
             return new DialogTurn(TurnKind.Incomplete, string.Join('\n', issues.Select(issue => $"{issue.Field}: {issue.Problem}"))) { Issues = issues };
 
         var output = await system.RunAsync(system.Schema.Fields.Typed(state.Values), ct);
-        var sensitive = (await Sensitivity.FieldsAsync(system, state.Values, output, _options.Tolerance, ct))
-            .Where(field => !state.Asked.Contains(field.Name))
-            .ToList();
-        if (sensitive.Count > 0)
+        var check = await Sensitivity.CheckAsync(system, state.Values, output, _options.Tolerance, ct);
+        var toAsk = check.Sensitive.Where(field => !state.Asked.Contains(field.Name)).ToList();
+        if (toAsk.Count > 0)
         {
-            state.Asked.UnionWith(sensitive.Select(field => field.Name));
-            return await AskAsync(state, sensitive.Select(field => Question.For(field, Question.AffectsResult)).ToList(), ct);
+            state.Asked.UnionWith(toAsk.Select(field => field.Name));
+            return await AskAsync(state, toAsk.Select(field => Question.ForAssumption(field, state.Values[field.Name])).ToList(), ct);
         }
 
         state.Output = new Dictionary<string, object?>(output);
-        var text = await _explainer.ExplainAsync(system.Schema, state.Values, output, ct: ct);
-        return new DialogTurn(TurnKind.Result, text) { Output = output };
+        var text = await _explainer.ExplainAsync(system.Schema, state.Values, output, check: check, ct: ct);
+        return new DialogTurn(TurnKind.Result, text) { Output = output, Check = check };
     }
 
     private async Task<DialogTurn> WhatIfAsync(ExpertSystem system, FormState state, string message, CancellationToken ct)
     {
         var change = await _extractor.ExtractAsync(system.Schema.Fields, new SourceText(message), ValueSource.User, $"{WhatIfContext}\n\n{state.Context()}", ct);
         if (change.Values.Count == 0)
-            return new DialogTurn(TurnKind.Answer, "Не понял, какие данные поменять. Назовите поле и новое значение.");
+            return new DialogTurn(TurnKind.Answer, "Не понял, какие данные поменять. Назовите, что изменить и на какое значение.");
 
         var values = new Dictionary<string, FieldValue>(state.Values);
         foreach (var (name, value) in change.Values)
             values[name] = value;
 
         var output = await system.RunAsync(system.Schema.Fields.Typed(values), ct);
-        var text = await _explainer.ExplainAsync(system.Schema, values, output, message, state.Output, ct);
+        var text = await _explainer.ExplainAsync(system.Schema, values, output, message, state.Output, ct: ct);
         return new DialogTurn(TurnKind.Answer, text) { Output = output };
     }
 

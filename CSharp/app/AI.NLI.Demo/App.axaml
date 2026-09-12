@@ -4,5 +4,6 @@
              RequestedThemeVariant="Light">
   <Application.Styles>
     <FluentTheme />
+    <StyleInclude Source="avares://AI.NLI.Demo/Styles/Theme.axaml" />
   </Application.Styles>
 </Application>

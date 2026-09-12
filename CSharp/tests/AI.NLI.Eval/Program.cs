@@ -1,7 +1,7 @@
 using System.Text;
 using AI.NLI;
+using AI.NLI.Demo;
 using AI.NLI.Eval;
-using AI.NLI.Samples;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -20,6 +20,7 @@ if (chat is null)
     return 2;
 }
 
+var system = TaganrogRegression.System(FormSchema.FromYaml(TaganrogRegression.SchemaYaml));
 var cases = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build()
     .Deserialize<EvalCase[]>(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "cases.yaml")));
 var scores = new List<EvalScore>();
@@ -29,6 +30,8 @@ foreach (var eval in cases)
     scores.Add(score);
     Console.WriteLine($"{score.Case,-28} верно {score.Correct}/{score.Expected}, неверно {score.Wrong}, выдумано {score.Fabricated}, " +
                       $"вопросов {score.Questions}{(score.AssumptionMattered ? ", допущение влияло на вывод" : "")}");
+    foreach (var miss in score.Misses)
+        Console.WriteLine($"    {miss}");
 }
 
 var filled = scores.Sum(score => score.Correct + score.Wrong + score.Fabricated);
@@ -46,7 +49,7 @@ return precision >= MinPrecision && recall >= MinRecall && fabricated <= MaxFabr
 async Task<EvalScore> RunAsync(EvalCase eval)
 {
     var state = new FormState();
-    var dialog = new FormDialog(chat, [Apartment.System]);
+    var dialog = new FormDialog(chat, [system]);
     var (questions, mattered) = (0, false);
 
     var turn = await dialog.ReplyAsync(state, eval.Turns[0]);
@@ -59,5 +62,5 @@ async Task<EvalScore> RunAsync(EvalCase eval)
             : await dialog.ChooseAsync(state, turn.Questions[0].Field, Question.DontKnow);
     }
 
-    return EvalScore.Of(eval, Apartment.System.Schema, state, questions, mattered);
+    return EvalScore.Of(eval, system.Schema, state, questions, mattered);
 }

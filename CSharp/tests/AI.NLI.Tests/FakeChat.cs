@@ -38,14 +38,22 @@ internal sealed class FakeChat(Func<string, string> reply) : IChatClient
     public static Func<string, string> Route(params (string Marker, Func<string, string> Reply)[] routes) =>
         prompt => routes.FirstOrDefault(route => prompt.Contains(route.Marker)).Reply?.Invoke(prompt) ?? Empty;
 
-    /// <summary>Ответ извлечения: значения с цитатами.</summary>
+    /// <summary>Ответ извлечения: точные значения с цитатами.</summary>
     public static string Values(params (string Name, string Value, string Evidence)[] values) =>
-        JsonSerializer.Serialize(new
-        {
-            values = values.Select(value => new { name = value.Name, value = value.Value, evidence = value.Evidence, unknown = false, approximate = false })
-        });
+        Reply(values.Select(value => (value.Name, value.Value, value.Evidence, "exact")));
 
     /// <summary>Ответ извлечения: пользователь не знает значения.</summary>
-    public static string Unknown(string name, string evidence) =>
-        JsonSerializer.Serialize(new { values = new[] { new { name, value = "", evidence, unknown = true, approximate = false } } });
+    public static string Unknown(string name, string evidence) => Reply([(name, "", evidence, "unknown")]);
+
+    /// <summary>Ответ извлечения: названа только граница.</summary>
+    public static string Bound(string name, string estimate, string evidence) => Reply([(name, estimate, evidence, "bound")]);
+
+    /// <summary>Ответ извлечения: значение названо примерно.</summary>
+    public static string Approximate(string name, string value, string evidence) => Reply([(name, value, evidence, "approximate")]);
+
+    /// <summary>Ответ извлечения с разной точностью значений: kind это exact, approximate, bound или unknown.</summary>
+    public static string Mixed(params (string Name, string Value, string Evidence, string Kind)[] values) => Reply(values);
+
+    private static string Reply(IEnumerable<(string Name, string Value, string Evidence, string Kind)> values) =>
+        JsonSerializer.Serialize(new { values = values.Select(value => new { name = value.Name, value = value.Value, evidence = value.Evidence, kind = value.Kind }) });
 }

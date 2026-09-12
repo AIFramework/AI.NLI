@@ -1,7 +1,6 @@
 <Solution>
   <Folder Name="/app/">
     <Project Path="app/AI.NLI.Demo/AI.NLI.Demo.csproj" />
-    <Project Path="app/AI.NLI.Samples/AI.NLI.Samples.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/AI.NLI/AI.NLI.csproj" />

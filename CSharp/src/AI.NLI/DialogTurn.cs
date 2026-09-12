@@ -7,7 +7,7 @@ public enum TurnKind
     Questions,
     /// <summary>Спрашивать больше нечего, но форма не готова: <see cref="DialogTurn.Issues"/>.</summary>
     Incomplete,
-    /// <summary>Экспертная система отработала: вывод и объяснение.</summary>
+    /// <summary>Экспертная система отработала: вывод, объяснение и проверка допущений.</summary>
     Result,
     /// <summary>Ответ на вопрос о выводе или на вопрос «что если»; состояние формы не менялось.</summary>
     Answer
@@ -24,8 +24,11 @@ public sealed record DialogTurn(TurnKind Kind, string Text)
     /// <summary>Проблемы формы.</summary>
     public IReadOnlyList<FieldIssue> Issues { get; init; } = [];
 
-    /// <summary>Вывод экспертной системы.</summary>
+    /// <summary>Вывод экспертной системы: у результата и у ответа «что если».</summary>
     public IReadOnlyDictionary<string, object?>? Output { get; init; }
+
+    /// <summary>Какие неточные значения влияют на вывод, а какие нет: у результата.</summary>
+    public AssumptionCheck? Check { get; init; }
 }
 
 /// <summary>Настройки диалога.</summary>

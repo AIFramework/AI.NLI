@@ -4,7 +4,9 @@ namespace AI.NLI;
 /// <param name="Field">Имя поля.</param>
 /// <param name="Text">Формулировка.</param>
 /// <param name="Choices">Готовые ответы: выбор применяется без модели.</param>
-/// <param name="Reason">Почему спрашиваем: <see cref="NoData"/>, <see cref="Contradiction"/> или <see cref="AffectsResult"/>.</param>
+/// <param name="Reason">
+/// Почему спрашиваем: <see cref="NoData"/>, <see cref="Contradiction"/>, <see cref="Vague"/> или <see cref="AffectsResult"/>.
+/// </param>
 public sealed record Question(string Field, string Text, string[] Choices, string Reason)
 {
     /// <summary>Ответ «не знаю»: поле больше не спрашивают.</summary>
@@ -16,7 +18,10 @@ public sealed record Question(string Field, string Text, string[] Choices, strin
     /// <summary>Источники разошлись.</summary>
     public const string Contradiction = "противоречие";
 
-    /// <summary>Значение было допущением, а вывод от него зависит.</summary>
+    /// <summary>Названа только граница или диапазон.</summary>
+    public const string Vague = "нужно точнее";
+
+    /// <summary>Значение было допущением или приблизительным, а вывод от него зависит.</summary>
     public const string AffectsResult = "от этого зависит вывод";
 
     /// <summary>Вопрос о поле с готовыми ответами по его типу.</summary>
@@ -34,4 +39,15 @@ public sealed record Question(string Field, string Text, string[] Choices, strin
         $"{conflict.Offered.SourceLabel} дает «{conflict.Offered.Value}». Какое значение верное?",
         [conflict.Current.Value, conflict.Offered.Value],
         Contradiction);
+
+    /// <summary>Переспрос границы с цитатой сказанного.</summary>
+    public static Question ForVague(FormField field, FieldValue bound) =>
+        For(field, Vague) with { Text = $"{field.Describe()}: сказано «{bound.Evidence}», нужно точное значение" };
+
+    /// <summary>Вопрос о допущении, от которого зависит вывод: с тем, что взято сейчас.</summary>
+    public static Question ForAssumption(FormField field, FieldValue current) =>
+        For(field, AffectsResult) with
+        {
+            Text = $"{field.Describe()}: сейчас взято {current.Value} ({current.SourceLabel}{(current.Approximate && !current.IsAssumed ? ", названо примерно" : "")})"
+        };
 }

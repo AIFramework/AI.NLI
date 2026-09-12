@@ -1,39 +1,227 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AI.NLI.Demo.ViewModels"
         x:Class="AI.NLI.Demo.MainWindow"
-        Title="AI.NLI: диалог с экспертной системой"
-        Width="1400" Height="820">
-  <Grid ColumnDefinitions="*,1.3*,*" RowDefinitions="*,Auto" Margin="12">
+        x:DataType="vm:MainViewModel"
+        Title="AI.NLI: оценка квартиры в Таганроге"
+        Width="1380" Height="880" MinWidth="1040" MinHeight="640"
+        Background="{DynamicResource PageBrush}">
 
-    <DockPanel Grid.Column="0" Margin="0,0,8,0">
-      <TextBlock DockPanel.Dock="Top" Text="Экспертная система (YAML)" FontWeight="SemiBold" Margin="0,0,0,4" />
-      <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,8,0,0">
-        <TextBlock Text="Модель OpenRouter" />
-        <TextBox x:Name="ModelInput" />
-        <CheckBox x:Name="VerifyBox" Content="Проверять, что значение следует из цитаты" />
-        <Button Content="Новый диалог" Click="OnReset" />
-        <TextBlock Text="Описание, модель и флаг применяются с нового диалога." TextWrapping="Wrap" Opacity="0.7" />
+  <Window.DataTemplates>
+    <DataTemplate DataType="vm:Chip">
+      <Button Classes="chip" Content="{Binding Label}" Command="{Binding Command}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:UserBubble">
+      <Border Classes="user">
+        <SelectableTextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+      </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:SystemBubble">
+      <Border Classes="bot" Classes.warning="{Binding IsWarning}">
+        <SelectableTextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+      </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:WelcomeCard">
+      <Border Classes="bot">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="Здравствуйте!" />
+          <TextBlock TextWrapping="Wrap" FontSize="14" LineHeight="21"
+                     Text="Опишите квартиру своими словами. Я пойму, что вы сказали, спрошу только то, что влияет на оценку, и объясню результат. Справа видно каждое значение и откуда оно взято." />
+          <TextBlock Classes="muted" Text="Можно начать так:" Margin="0,4,0,0" />
+          <ItemsControl ItemsSource="{Binding Examples}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:QuestionCard">
+      <Border Classes="bot">
+        <StackPanel Spacing="12">
+          <TextBlock Classes="eyebrow" Text="НУЖНО УТОЧНИТЬ" />
+          <ItemsControl ItemsSource="{Binding Items}" IsEnabled="{Binding IsOpen}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><StackPanel Spacing="16" /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:QuestionItem">
+      <StackPanel Spacing="8">
+        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="14" LineHeight="21" />
+        <Border Classes="tag" IsVisible="{Binding HasReason}">
+          <TextBlock Text="{Binding Reason}" />
+        </Border>
+        <ItemsControl ItemsSource="{Binding Choices}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
       </StackPanel>
-      <TextBox x:Name="SchemaInput" AcceptsReturn="True" FontFamily="Consolas,monospace" />
-    </DockPanel>
+    </DataTemplate>
 
-    <DockPanel Grid.Column="1" Margin="8,0">
-      <TextBlock DockPanel.Dock="Top" Text="Диалог" FontWeight="SemiBold" Margin="0,0,0,4" />
-      <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,8,0,0">
-        <WrapPanel x:Name="ChoicesPanel" />
-        <TextBox x:Name="MessageInput" AcceptsReturn="True" TextWrapping="Wrap" Height="80" />
-        <Button x:Name="SendButton" Content="Отправить" Click="OnSend" />
-      </StackPanel>
-      <TextBox x:Name="LogText" IsReadOnly="True" TextWrapping="Wrap" />
-    </DockPanel>
+    <DataTemplate DataType="vm:ResultCard">
+      <Border Classes="bot result">
+        <StackPanel Spacing="12">
+          <TextBlock Classes="eyebrow" Text="{Binding Title}" />
+          <ItemsControl ItemsSource="{Binding Metrics}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+          <SelectableTextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+          <ItemsControl ItemsSource="{Binding Notes}" IsVisible="{Binding HasNotes}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><StackPanel Spacing="6" /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+          <ItemsControl ItemsSource="{Binding Actions}" IsVisible="{Binding HasActions}" Margin="0,4,0,0">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </DataTemplate>
 
-    <Grid Grid.Column="2" RowDefinitions="Auto,*,Auto,*" Margin="8,0,0,0">
-      <TextBlock Text="Состояние формы" FontWeight="SemiBold" Margin="0,0,0,4" />
-      <TextBox Grid.Row="1" x:Name="StateText" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas,monospace" />
-      <TextBlock Grid.Row="2" Text="Журнал происхождения" FontWeight="SemiBold" Margin="0,8,0,4" />
-      <TextBox Grid.Row="3" x:Name="JournalText" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas,monospace" />
+    <DataTemplate DataType="vm:Metric">
+      <Border Classes="metric" Classes.main="{Binding IsMain}">
+        <StackPanel Spacing="2">
+          <TextBlock Classes="metric-value" Text="{Binding Value}" />
+          <TextBlock Classes="metric-label" Text="{Binding Label}" />
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:Note">
+      <Border Classes="notice" Classes.warning="{Binding IsWarning}">
+        <TextBlock Text="{Binding Text}" />
+      </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:FieldRow">
+      <Border Classes="row">
+        <StackPanel Spacing="4">
+          <DockPanel>
+            <Border DockPanel.Dock="Right" Classes="badge" Background="{Binding Badge.Background}">
+              <TextBlock Text="{Binding Badge.Text}" Foreground="{Binding Badge.Foreground}" FontSize="11" FontWeight="SemiBold" />
+            </Border>
+            <TextBlock Classes="muted" Text="{Binding Title}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+          </DockPanel>
+          <TextBlock Classes="value" Text="{Binding Value}" TextWrapping="Wrap" />
+          <TextBlock Classes="quote" Text="{Binding Evidence}" IsVisible="{Binding HasEvidence}" />
+          <TextBlock Classes="note" Text="{Binding Note}" IsVisible="{Binding HasNote}" />
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:JournalRow">
+      <Grid ColumnDefinitions="68,*" Margin="0,0,0,10">
+        <TextBlock Classes="muted" Text="{Binding Time}" Margin="0,1,0,0" />
+        <StackPanel Grid.Column="1" Spacing="1">
+          <TextBlock Text="{Binding Text}" FontSize="13" TextWrapping="Wrap" />
+          <TextBlock Classes="muted" Text="{Binding Detail}" IsVisible="{Binding HasDetail}" TextWrapping="Wrap" />
+        </StackPanel>
+      </Grid>
+    </DataTemplate>
+  </Window.DataTemplates>
+
+  <Grid RowDefinitions="Auto,*">
+
+    <Border Classes="header">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="14">
+          <Border Classes="logo"><TextBlock Text="NLI" /></Border>
+          <StackPanel VerticalAlignment="Center" Spacing="2">
+            <TextBlock Classes="h1" Text="Оценка квартиры в Таганроге" />
+            <TextBlock Classes="muted" Text="Экспертная система: множественная регрессия · диалог на естественном языке через AI.NLI" />
+          </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+          <TextBox Text="{Binding Model}" Width="230" Watermark="Модель OpenRouter"
+                   ToolTip.Tip="Модель применяется с нового диалога" />
+          <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center"
+                      ToolTip.Tip="Модель дополнительно подтверждает, что каждое значение следует из цитаты">
+            <ToggleSwitch IsChecked="{Binding Verify}" OnContent="" OffContent="" MinWidth="0" />
+            <TextBlock Text="Проверка по цитате" VerticalAlignment="Center" />
+          </StackPanel>
+          <Button Classes="ghost" Content="Новый диалог" Command="{Binding ResetCommand}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="*,440">
+
+      <Grid RowDefinitions="*,Auto">
+        <ScrollViewer x:Name="ChatScroll" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Margin="32,24,32,12" Spacing="14">
+            <ItemsControl ItemsSource="{Binding Messages}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate><StackPanel Spacing="14" /></ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <Border Classes="bot" IsVisible="{Binding IsBusy}">
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <ProgressBar Classes="progress" IsIndeterminate="True" Width="56" MinWidth="56" VerticalAlignment="Center" />
+                <TextBlock Classes="muted" Text="{Binding Status}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Margin="32,4,32,18" Spacing="6">
+          <Border Classes="composer">
+            <DockPanel>
+              <Button DockPanel.Dock="Right" Classes="primary" Content="Отправить" Command="{Binding SendCommand}" />
+              <TextBox x:Name="Composer" Classes="composer" Text="{Binding Message}" TextWrapping="Wrap"
+                       Watermark="Напишите сообщение и нажмите Enter">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{Binding SendCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
+            </DockPanel>
+          </Border>
+          <TextBlock Classes="muted" Text="{Binding Status}" Margin="10,0" IsVisible="{Binding IsIdle}" />
+        </StackPanel>
+      </Grid>
+
+      <Border Grid.Column="1" Classes="side">
+        <TabControl>
+          <TabItem Header="Форма">
+            <DockPanel Margin="0,10,0,0">
+              <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,14">
+                <TextBlock Classes="muted" Text="{Binding ProgressText}" />
+                <ProgressBar Classes="progress" Value="{Binding Progress}" Maximum="100" />
+              </StackPanel>
+              <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding Fields}" />
+              </ScrollViewer>
+            </DockPanel>
+          </TabItem>
+          <TabItem Header="Журнал">
+            <ScrollViewer Margin="0,10,0,0">
+              <ItemsControl ItemsSource="{Binding Journal}" />
+            </ScrollViewer>
+          </TabItem>
+          <TabItem Header="Описание">
+            <DockPanel Margin="0,10,0,0">
+              <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,10,0,0">
+                <TextBlock Classes="muted" TextWrapping="Wrap"
+                           Text="Правка описания применяется к новому диалогу. Регрессия узнает поля по именам, формула дописывается к описанию сама." />
+                <Button Classes="ghost" Content="Применить и начать заново" Command="{Binding ResetCommand}" />
+              </StackPanel>
+              <TextBox Classes="code" Text="{Binding SchemaYaml}" AcceptsReturn="True" />
+            </DockPanel>
+          </TabItem>
+        </TabControl>
+      </Border>
     </Grid>
-
-    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" x:Name="StatusText" Margin="0,8,0,0" TextWrapping="Wrap" />
   </Grid>
 </Window>

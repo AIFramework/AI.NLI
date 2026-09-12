@@ -11,10 +11,14 @@
     <PackageReference Include="Avalonia" Version="11.3.6" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.6" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.6" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <!-- OpenRouter совместим с API OpenAI: клиент OpenAI с другим адресом -->
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AI.NLI.Samples\AI.NLI.Samples.csproj" />
+    <ProjectReference Include="..\..\src\AI.NLI\AI.NLI.csproj" />
   </ItemGroup>
 
   <ItemGroup>
